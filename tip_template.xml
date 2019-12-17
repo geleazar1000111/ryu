@@ -1,0 +1,90 @@
+<KinBody name="osaro_gripper_suction_v2">
+
+    <KinBody file='no_tip_charuco.xml'/>
+
+    <Body name="link_suction_tube">
+        <OffsetFrom>link_suction_mount</OffsetFrom>
+        <Geom type="cylinder" name="suction_tube">
+            <Radius>0</Radius>
+            <Height>0</Height>
+            <!-- Translated down half of the height -->
+            <Translation>0 0 0</Translation>
+            <!-- Rotation for OpenRAVE cylinder bug -->
+            <RotationAxis>1 0 0 90</RotationAxis>
+        </Geom>
+    </Body>
+    <Body name="link_compressed_suction_tube" enable="false">
+        <OffsetFrom>link_suction_mount</OffsetFrom>
+        <Geom type="cylinder" name="suction_tube">
+            <Radius>0</Radius>
+            <Height>0</Height>
+            <!-- Translated down half of the height -->
+            <Translation>0 0 0</Translation>
+            <!-- Rotation for OpenRAVE cylinder bug -->
+            <RotationAxis>1 0 0 90</RotationAxis>
+        </Geom>
+    </Body>
+
+
+    <!-- fixed joints connecting links -->
+    <Joint name="joint_suction_tube" enable="false">
+        <Body>link_suction_mount</Body>
+        <Body>link_suction_tube</Body>
+        <Limits>0 0</Limits>
+    </Joint>
+    <Joint name="joint_suction_tube" enable="false">
+        <Body>link_suction_mount</Body>
+        <Body>link_compressed_suction_tube</Body>
+        <Limits>0 0</Limits>
+    </Joint>
+
+
+    <!-- dummy links for frames -->
+    <Body name="frame_tooltip">
+        <OffsetFrom>link_suction_tube</OffsetFrom>
+        <!-- Translated by length of tube -->
+        <Translation>0 0 0</Translation>
+    </Body>
+    <Body name="frame_osaro_tooltip">
+        <OffsetFrom>frame_tooltip</OffsetFrom>
+        <!-- Rotation to Osaro frame -->
+        <RotationAxis>0 1 0 180</RotationAxis>
+        <RotationAxis>0 0 1 180</RotationAxis>
+    </Body>
+    <Body name="frame_compressed_tooltip" enable="false">
+        <OffsetFrom>link_compressed_suction_tube</OffsetFrom>
+        <!-- Translated by length of tube -->
+        <Translation>0 0 0</Translation>
+    </Body>
+    <Body name="frame_osaro_compressed_tooltip" enable="false">
+        <OffsetFrom>frame_compressed_tooltip</OffsetFrom>
+        <!-- Rotation to Osaro frame -->
+        <RotationAxis>0 1 0 180</RotationAxis>
+        <RotationAxis>0 0 1 180</RotationAxis>
+    </Body>
+
+
+    <!-- fixed joints connecting dummy links -->
+    <Joint name="joint_frame_tooltip" enable="false">
+        <Body>link_suction_tube</Body>
+        <Body>frame_tooltip</Body>
+        <Limits>0 0</Limits>
+    </Joint>
+    <Joint name="joint_frame_osaro_tooltip" enable="false">
+        <Body>frame_tooltip</Body>
+        <Body>frame_osaro_tooltip</Body>
+        <Limits>0 0</Limits>
+    </Joint>
+    <Joint name="joint_frame_compressed_tooltip" enable="false">
+        <Body>link_compressed_suction_tube</Body>
+        <Body>frame_compressed_tooltip</Body>
+        <Limits>0 0</Limits>
+    </Joint>
+    <Joint name="joint_frame_osaro_compressed_tooltip" enable="false">
+        <Body>frame_compressed_tooltip</Body>
+        <Body>frame_osaro_compressed_tooltip</Body>
+        <Limits>0 0</Limits>
+    </Joint>
+
+</KinBody>
+
