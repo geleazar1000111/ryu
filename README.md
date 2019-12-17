@@ -8,3 +8,4 @@ Current tools:
     - So far, the user must edit the paths in the file so that reading and writing are from the correct locations. ```tip_template.xml```should be run from wherever the user stored it, while ```tip_h[]_r[]_charuco.xml``` should be specified in the user's local ```odin``` repo.
     - This script only creates the tip kinbody. It does not create files within ```prefab```. I figured that editing prefab files doesn't take too long, but if it also adds to the tediousness, I may adjust the script so that it also creates that prefab file.
     - The positional arguments ```robot name```, ```height```, and ```radius``` must be input in that order.
+    - The .xml files are created by copying from the tip template and then modifying them. I think it would be more efficient to create the .xml files without copying them, but since these aren't very large files I don't think it's that big of a deal (for now).
