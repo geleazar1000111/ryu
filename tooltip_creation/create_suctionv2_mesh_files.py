@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 
 def main():
     args = get_args()
-    robot_name = args['robot name']
+    robot_name = args['robot_name']
     radius = args['radius']
     height = args['height']
     translation = height / 2
@@ -20,10 +20,10 @@ def main():
     compressed_translation_mm = compressed_height_mm / 2
 
     '''TODO: replace with odin pathname'''
-    tip_pathname = "/Users/geraldineeleazar/Desktop/tip_temps/tip_h{}_r{}_charuco.xml".format(height, radius)
+    tip_pathname = "tip_h{}_r{}_charuco.xml".format(height, radius)
     try:
         '''TODO: replace with odin pathname'''
-        shutil.copy('/Users/geraldineeleazar/Desktop/tip_template.xml', tip_pathname)
+        shutil.copy('tip_template.xml', tip_pathname)
     except shutil.Error as err:
         print(err)
     create_tip_kinbody(tip_pathname, radius_mm, height_mm, translation_mm, compressed_height_mm,
@@ -37,7 +37,7 @@ def get_args():
                                                                                     'iiwa14 | KR10: kr10 | Fanuc LR '
                                                                                     'Mate: lr_mate_200id_7l | M-20: '
                                                                                     'm-20ia | UR10: ur10')
-    parser.add_argument('robot name', type=str, help='name of robot i.e. vs050, ur10, etc.')
+    parser.add_argument('robot_name', type=str, help='name of robot i.e. vs050, ur10, etc.')
     parser.add_argument('height', type=int, help='length of the tooltip')
     parser.add_argument('radius', type=int, help='radius of suction cup')
     return vars(parser.parse_args())
