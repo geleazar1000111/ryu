@@ -1,20 +1,20 @@
 from __future__ import print_function
 import re
-from datetime import datetime, timezone, timedelta
+import argparse
+from datetime import datetime, timedelta
 import pytz
 import pickle
 import os.path
-import math
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
-
 
 '''One hour padding in WORK_START and WORK_END. We still want the ability to book until 5pm and after 9am'''
 UTC_OFFSET_TIMEDELTA = datetime.utcnow() - datetime.now()
 WORK_START = datetime.strptime("10:00:00", "%H:%M:%S").time()
 WORK_END = datetime.strptime("16:00:00", "%H:%M:%S").time()
 SCOPES = ['https://www.googleapis.com/auth/calendar']
+valid_date = re.compile("[\d]{1,2}/[\d]{1,2}/[\d]{4}")
 tz = pytz.timezone('US/Pacific')
 robots = {
     'VS': 'osaro.com_3138373730323034343235@resource.calendar.google.com',
@@ -27,6 +27,7 @@ robots = {
     'KWSK': 'osaro.com_3637383431393334343032@resource.calendar.google.com',
     'IRB': 'osaro.com_3234333336343235363734@resource.calendar.google.com'
 }
+
 
 def get_creds():
     creds = None
@@ -85,24 +86,23 @@ def get_day_of_week(event_date):
              + int(year / 400) + t[month - 1] + day) % 7)
 
 
-def get_events(max_results):
-    creds = get_creds()
-    service = build('calendar', 'v3', credentials=creds)
-    # Call the Calendar API
-    now = datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-    colors = service.colors().get(fields='event').execute()
-    events_result = service.events().list(calendarId='primary', timeMin=now, maxResults=max_results,
-                                          singleEvents=True, orderBy='startTime').execute() #chng to timeMin=sprint start and timeMax=sprint end
-    events = events_result.get('items', [])
-    return events, colors
+def ask_to_book():
+    while True:
+        user_inp = input("Would you like to book the robot? (y/n) ")
+        if user_inp.lower() == 'y':
+            return True
+        elif user_inp.lower() == 'n':
+            return False
+        else:
+            print("Invalid option (please type y or n) ")
 
 
-def get_freebusy(robot_id): #params: robot, start_day, start_month, start_year, end_day, end_month, end_year
+def get_freebusy(robot_id, start_month, start_day, start_year, end_month, end_day, end_year):
     creds = get_creds()
     service = build('calendar', 'v3', credentials=creds)
-    time_min = tz.localize(datetime(2019, 12, 18))
-    time_max = tz.localize(datetime(2019, 12, 21))
-    body= {
+    time_min = tz.localize(datetime(start_year, start_month, start_day))
+    time_max = tz.localize(datetime(end_year, end_month, end_day))
+    body = {
         "timeMin": time_min.isoformat(),
         "timeMax": time_max.isoformat(),
         "timeZone": 'US/Pacific',
@@ -120,10 +120,10 @@ def get_freebusy(robot_id): #params: robot, start_day, start_month, start_year, 
         for event in booked:
             print("{} is booked {} until {}".format(robot_id, event['start'], event['end']))
         start_next_event = get_next_available(booked)
-        construct_and_book_event(service, robot_id, start_next_event, add_hour_to_datetime(start_next_event))
     else:
-        print("{} is free in this time range. Booking next available 1 hr time slot...".format(robot_id))
+        print("{} is free in this time range".format(robot_id))
         start_next_event = time_min + timedelta(hours=9)
+    if ask_to_book():
         construct_and_book_event(service, robot_id, start_next_event, add_hour_to_datetime(start_next_event))
 
 
@@ -141,9 +141,9 @@ def get_next_available(booked_events):
         event1_end = convert_google_datetime(booked_events[0]['end'])
         if event1_end.time() <= WORK_END:
             return event1_end
-    for i in range(len(booked_events)-1):
+    for i in range(len(booked_events) - 1):
         event1_end = convert_google_datetime(booked_events[i]['end'])
-        event2_start = convert_google_datetime(booked_events[i+1]['start'])
+        event2_start = convert_google_datetime(booked_events[i + 1]['start'])
         diff = event2_start - event1_end
         diff_hours = diff.total_seconds() // 3600
         if diff_hours >= 1:
@@ -169,9 +169,29 @@ def construct_and_book_event(service, robot_id, start_event, end_event):
     print('Link to event: {}'.format(event.get('htmlLink')))
 
 
+def get_args():
+    parser = argparse.ArgumentParser(description='Check availability in time range and/or book robot calendar based '
+                                                 'on that availability', epilog='Robot keys: VS, M-20, LR-MATE, IIWA, '
+                                                                                'KR10, UR10, YASK, KWSK, IRB')
+    parser.add_argument('robot name', type=str, help='name of robot i.e. VS, M-20, etc.')
+    parser.add_argument('start date', type=str, help='start of range MM/DD/YYYY')
+    parser.add_argument('end date', type=str, help='end of range MM/DD/YYYY')
+    return vars(parser.parse_args())
+
+
+def parse_date_from_args(datestr):
+    return [int(x) for x in datestr.split("/")]
+
+
 def main():
     '''Input: start date, end date, robot'''
-    get_freebusy('M-20')
+    args = get_args()
+    robot_id = args['robot name']
+    assert valid_date.match(args['start date']), "Invalid date format"
+    assert valid_date.match(args['end date']), "Invalid date format"
+    start_date = parse_date_from_args(args['start date'])
+    end_date = parse_date_from_args(args['end date'])
+    get_freebusy(robot_id, start_date[0], start_date[1], start_date[2], end_date[0], end_date[1], end_date[2])
 
 
 if __name__ == '__main__':
