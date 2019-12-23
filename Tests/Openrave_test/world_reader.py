@@ -62,6 +62,7 @@ def cli(world_file, odin_mesh_folder):
         robot.SetDOFValues(np.deg2rad(dofs_deg))
 
     def get_distance_query():
+        # NOT WORKING!
         report = openravepy.CollisionReport()
         env = world._env
         if not env.GetCollisionChecker().SetCollisionOptions(openravepy.CollisionOptions.Distance | openravepy.CollisionOptions.Contacts):
