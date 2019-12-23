@@ -21,6 +21,12 @@ def main():
     args = get_args()
     config = load_datacollection_config(args['path'])
     pick_models = list(config['models']['pick_models'].keys())
+    print(pick_models)
+
+    calibration = config['cached_calibrations']
+    print(type(calibration))
+
+    print(config["tooltips"]["end_effectors"])
 
 if __name__ == '__main__':
     main()
