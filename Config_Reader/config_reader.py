@@ -14,6 +14,9 @@ class Reader(abc.ABC):
             contents = f.read()
             self.config = yaml.load(contents)
 
+        #list all the robots name if the office, for read end effector path in world.yaml
+        self.robots = ["lrmate200id_7l", "gp7", "kr10_r1100", "m-20ia", "ur10", "vs050"]
+
     @abc.abstractmethod
     def end_effector_reader(self):
         """define method to read end effector setting"""
@@ -41,6 +44,7 @@ class Reporter(abc.ABC):
         self.paths = paths
         self.readers = {}
         self.create_reader()
+        self.camera_conversion = {}
 
 
     @abc.abstractmethod
