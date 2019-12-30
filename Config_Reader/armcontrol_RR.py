@@ -1,10 +1,12 @@
 from config_reader import Reader, Reporter
+
 import os
+import warnings
 
-class Hardware_Reader(Reader):
-
+class Armcontrol_Reader(Reader):
     def end_effector_reader(self):
         pass
+
 
     def pick_model_reader(self):
         pass
@@ -13,12 +15,10 @@ class Hardware_Reader(Reader):
         pass
 
     def camera_setting_reader(self):
-        cameras = {}
-        for key in self.config.keys():
-            if key.find("_rs") != -1:
-                cameras[key] = self.config[key]
-
-        return cameras
+        pass
 
     def dof_reader(self):
-        pass
+        limits = {}
+        limits["lower"] = self.config["dof_limits_lower_deg"]
+        limits["upper"] = self.config["dof_limits_upper_deg"]
+        return limits
