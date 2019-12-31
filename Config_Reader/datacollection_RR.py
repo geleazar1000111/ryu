@@ -6,7 +6,7 @@ import os
 import warnings
 import numpy as np
 
-os.environ.setdefault("ODIN_MESH_FOLDER", "/local/meshes")
+os.environ.setdefault("ODIN_MESH_FOLDER", "/local/meshes/")
 
 class Datacollcetion_Reader(Reader):
 
@@ -51,6 +51,7 @@ class Datacollection_Reporter(Reporter):
 
     def show_report(self):
         print("Analyzing Data Collection config ......")
+        print()
         self.show_end_effector()
         self.show_pick_models()
         self.show_bin_models()
@@ -72,6 +73,8 @@ class Datacollection_Reporter(Reporter):
             elif path.find("armcontrol.yaml") != -1:
                 print("Creating armcontrol reader from", path)
                 self.readers["armcontrol"] = Armcontrol_Reader(path)
+            elif path.find("mesh") != -1:
+                os.environ["ODIN_MESH_FOLDER"] = path
 
         print()
 
@@ -135,12 +138,13 @@ class Datacollection_Reporter(Reporter):
         print()
 
     def show_camera_setting(self):
-        print("Show cameras enbaled for each bin")
         camera_dict = self.readers["datacollection"].camera_setting_reader()
+        print("Show cameras enbaled for each bin")
+        for bin in camera_dict.keys():
+            print("For motion ", bin, ", the cameras enabled are: ", camera_dict[bin])
         if self.readers.get("hardware", None):
             camera_hardware = self.readers["hardware"].camera_setting_reader()
             for bin in camera_dict.keys():
-                print("For motion ", bin, ", the cameras enabled are: ", camera_dict[bin])
                 for cam in camera_dict[bin]:
                     if cam not in camera_hardware:
                         warnings.warn("FATAL ERROR, camera not enabled in hardware.yaml! Please delete {} in DC config or Hardware config!".format(cam), Warning)
@@ -169,6 +173,13 @@ class Datacollection_Reporter(Reporter):
                 if not all([a > b for a, b in zip(dof, lower)]):
                     warnings.warn("Please modify the dof: {}, so it is above the lower limit: {}".format(dof, upper))
                     break_flag = True
+
+        if self.decorators.get("world", None) and not break_flag:
+            self.decorators["world"].create_world(os.environ["ODIN_MESH_FOLDER"])
+            for bin in dofs:
+                print("Checking dof for bin :", bin)
+                self.decorators["world"].check_collision(dofs[bin]["handover_start_dofs_deg"])
+
 
 
 

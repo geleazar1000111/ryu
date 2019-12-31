@@ -55,6 +55,7 @@ class Reporter(abc.ABC):
         self.decorators = {}
         self.create_reader()
         self.create_decorator()
+        self.world = None
 
 
 

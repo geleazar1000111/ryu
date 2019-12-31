@@ -1,7 +1,13 @@
 from config_reader import Reader, Reporter
 import os
+import numpy as np
 import odin
 import openravepy
+import odin.simulator.openrave.factory as factory  # noqa
+import warnings
+
+OPENRAVE_DATABASE = "../openravedb"
+os.environ.setdefault("ODIN_MESH_FOLDER", "/local/meshes/")
 
 class World_Reader(Reader):
 
@@ -54,3 +60,23 @@ class World_Reporter(Reporter):
 
     def show_camera_setting(self):
         pass
+
+    def create_world(self, ODIN_MESH_FOLDER):
+        config = self.readers["world"].config
+        if "world_config" in config:
+            WORLD_CONFIG = config["world_config"]
+        elif "world" in config:
+            WORLD_CONFIG = config["world"]
+        else:
+            WORLD_CONFIG = config
+
+        self.world = factory.create_world_from_config(WORLD_CONFIG, ODIN_MESH_FOLDER)
+
+    def check_collision(self, pos):
+        robot = self.world._env.GetRobots()[0]
+        robot.SetDOFValues(np.deg2rad(pos))
+
+        for bin in ["a_bin", "b_bin"]:
+            bin = self.world._env.GetKinBody(bin)
+            if self.world._env.CheckCollision(robot, bin):
+                warnings.warn("robot is colliding with bin {}! Please jog the robot and change its handover pose!}".format(bin), Warning)
