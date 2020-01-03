@@ -102,13 +102,13 @@ class Datacollection_Reporter(Reporter):
             #check if model directory exist
             model_path = pick_models[pick_model]["config"][0]["saved_model"]["saved_model_dir"]
             if not os.path.exists(model_path):
-                warnings.warn("{} does not exist, please install the model!".format(model_path), Warning)
+                print("WARNING: {} does not exist, please install the model!".format(model_path))
                 print()
 
             #check if end effector in the enabled end effector list
             end_effector = pick_models[pick_model]["config"][0]["end_effector"]
             if end_effector not in [ee["name"] for ee in end_effectors]:
-                warnings.warn("{} not listed in config, model : {} is not able to run!".format(end_effector, pick_model), Warning)
+                print("WARNING: {} not listed in config, model : {} is not able to run!".format(end_effector, pick_model))
                 print()
 
         print()
@@ -120,7 +120,7 @@ class Datacollection_Reporter(Reporter):
             print(bin_model)
             model_path = bin_models[bin_model]["config"]["saved_model_dir"]
             if not os.path.exists(model_path):
-                warnings.warn("{} does not exist, please install the model!".format(model_path), Warning)
+                print("WARNING: {} does not exist, please install the model!".format(model_path))
                 print()
 
         print()
@@ -133,7 +133,7 @@ class Datacollection_Reporter(Reporter):
             camera_hardware = self.readers["hardware"].camera_setting_reader()
             for cali in calibrations:
                 if cali not in camera_hardware:
-                    warnings.warn("FATAL ERROR, camera not enabled in hardware.yaml! Please delete {} in DC config or Hardware config!".format(cali), Warning)
+                    print("FATAL ERROR: camera not enabled in hardware.yaml! Please delete {} in DC config or Hardware config!".format(cali))
 
         print()
 
@@ -147,18 +147,19 @@ class Datacollection_Reporter(Reporter):
             for bin in camera_dict.keys():
                 for cam in camera_dict[bin]:
                     if cam not in camera_hardware:
-                        warnings.warn("FATAL ERROR, camera not enabled in hardware.yaml! Please delete {} in DC config or Hardware config!".format(cam), Warning)
+                        print("FATAL ERROR: camera not enabled in hardware.yaml! Please delete {} in DC config or Hardware config!".format(cam))
 
         print()
 
     def show_dof(self):
         dofs = self.readers["datacollection"].dof_reader()
         break_flag = False
+        print("Checking whether the start and end dofs are the same .....")
         for bin in dofs:
             start = dofs[bin]["handover_start_dofs_deg"]
             end = dofs[bin]["handover_end_dofs_deg"]
             if not all(np.equal(start, end)):
-                warnings.warn("Please set start and end dofs for bin: {} as the same value, they are now different: {} {} ".format(bin, start, end))
+                print("WARNING: Please set start and end dofs for bin: {} as the same value, they are now different: {} {} ".format(bin, start, end))
                 break_flag = True
 
         if self.readers.get("armcontrol", None) and not break_flag:
@@ -168,10 +169,10 @@ class Datacollection_Reporter(Reporter):
             for bin in dofs:
                 dof = dofs[bin]["handover_start_dofs_deg"]
                 if not all([a < b for a, b in zip(dof, upper)]):
-                    warnings.warn("Please modify the dof: {}, so it is below the upper limit: {}".format(dof, upper))
+                    print("WARNING: Please modify the dof: {}, so it is below the upper limit: {}".format(dof, upper))
                     break_flag = True
                 if not all([a > b for a, b in zip(dof, lower)]):
-                    warnings.warn("Please modify the dof: {}, so it is above the lower limit: {}".format(dof, upper))
+                    print("WARNING: Please modify the dof: {}, so it is above the lower limit: {}".format(dof, upper))
                     break_flag = True
 
         if self.decorators.get("world", None) and not break_flag:
