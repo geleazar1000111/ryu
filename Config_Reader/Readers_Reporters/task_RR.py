@@ -70,12 +70,14 @@ class Task_Reporter(Reporter):
         self.show_bin_meshes()
         self.show_camera_setting()
 
+        print("IF YOU SEE NO WARNINGS ABOVE, YOU CAN START CHECKING OTHER CONFIGS\n")
+
 
     def show_end_effector(self):
-        config_ee = self.readers["datacollection"].end_effector_reader()
-        print("Showing end effectors specified for this task")
+        config_ees = self.readers["datacollection"].end_effector_reader()
         for ee in self.readers["task"].end_effector_reader():
-            if ee not in config_ee:
+            if not any(ee == config_ee["name"] for config_ee in config_ees):
+                print(config_ee["name"] for config_ee in config_ees)
                 print("WARNING: End effector {} is not included in data collection config! Please add it in the config file!\n".format(ee))
 
     def show_pick_models(self):
