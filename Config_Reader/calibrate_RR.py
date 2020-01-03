@@ -1,6 +1,7 @@
 from config_reader import Reader, Reporter
 from hardware_RR import  Hardware_Reader
 from datacollection_RR import Datacollcetion_Reader
+from projectTooltip_RR import ProjectTooltip_Reader
 import os
 import numpy as np
 
@@ -44,6 +45,9 @@ class Calibrate_Reporter(Reporter):
             elif path.find("datacollection/config.yaml") != -1:
                 print ("Creating datacollection reader from: ", path)
                 self.readers["datacollection"] = Datacollcetion_Reader(path)
+            elif path.find("project_to_tooltip.yaml") != -1:
+                print("Creating project_to_tooltip reader from", path)
+                self.readers["projectTooltip"] = ProjectTooltip_Reader(path)
 
         print()
 
@@ -96,12 +100,21 @@ class Calibrate_Reporter(Reporter):
             cam = list(cams[cam_name])[0]
             transform = cams[cam_name][cam]
             transformations.append(transform)
+
         if self.readers.get("datacollection", None):
             print("Checking enabled calibration in data collection config ......")
             calibrations = self.readers["datacollection"].calibration_reader()
             for cali in calibrations:
                 if cali not in transformations:
                     print("WARNING: {} is enbaled in data collection config but not exists in calibration!".format(cali))
+
+        if self.readers.get("projectTooltip", None):
+            print("Checking enbaled calibration in project_to_tooltip.yaml ......")
+            calibrations = self.readers["projectTooltip"].calibration_reader()
+            for cali in calibrations:
+                if cali not in transformations:
+                    print("WARNING: {} is enbaled in project_to_tooltip.yaml but not exists in calibration!".format(cali))
+
 
 
 
