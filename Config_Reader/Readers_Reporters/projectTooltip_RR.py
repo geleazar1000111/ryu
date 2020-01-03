@@ -1,5 +1,5 @@
-from config_reader import Reader, Reporter
-from hardware_RR import  Hardware_Reader
+from .config_reader import Reader, Reporter
+from .hardware_RR import  Hardware_Reader
 
 
 class ProjectTooltip_Reader(Reader):

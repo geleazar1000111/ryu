@@ -1,5 +1,5 @@
 import argparse
-from datacollection_RR import Datacollection_Reporter
+from Readers_Reporters.datacollection_RR import Datacollection_Reporter
 def get_args():
     parser = argparse.ArgumentParser(description='Please specify config path and mesh path. The order of the path is not essential. '
                                                  'Must have Data Collection config path, '

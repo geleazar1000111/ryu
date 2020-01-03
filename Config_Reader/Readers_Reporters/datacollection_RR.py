@@ -1,7 +1,7 @@
-from config_reader import Reader, Reporter
-from world_RR import World_Reader, World_Reporter
-from hardware_RR import  Hardware_Reader
-from armcontrol_RR import Armcontrol_Reader
+from .config_reader import Reader, Reporter
+from .world_RR import World_Reader, World_Reporter
+from .hardware_RR import  Hardware_Reader
+from .armcontrol_RR import Armcontrol_Reader
 import os
 import warnings
 import numpy as np
@@ -138,6 +138,7 @@ class Datacollection_Reporter(Reporter):
         print()
 
     def show_camera_setting(self):
+        calibrations = self.readers["datacollection"].calibration_reader()
         camera_dict = self.readers["datacollection"].camera_setting_reader()
         print("Show cameras enbaled for each bin")
         for bin in camera_dict.keys():
@@ -148,6 +149,8 @@ class Datacollection_Reporter(Reporter):
                 for cam in camera_dict[bin]:
                     if cam not in camera_hardware:
                         print("FATAL ERROR: camera not enabled in hardware.yaml! Please delete {} in DC config or Hardware config!".format(cam))
+                    if cam not in calibrations:
+                        print("WARNING: Camera transform {} is not listed in the cached calibration list!".format(cam))
 
         print()
 

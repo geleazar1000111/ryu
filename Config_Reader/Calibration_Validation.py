@@ -1,5 +1,5 @@
 import argparse
-from calibrate_RR import Calibrate_Reporter
+from Readers_Reporters.calibrate_RR import Calibrate_Reporter
 
 def get_args():
     parser = argparse.ArgumentParser(description='Please specify config path '
