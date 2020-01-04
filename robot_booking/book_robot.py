@@ -29,6 +29,28 @@ robots = {
 }
 
 
+class Freebusy_Display:
+    '''Where displaying events takes place'''
+    def __init__(self, robot_id, start_date, end_date):
+        self.robot_id = robot_id
+        self.start_date = self.parse_date_from_args(start_date)
+        self.end_date = self.parse_date_from_args(end_date)
+        self.start_month = self.start_date[0]
+        self.start_day = self.start_date[1]
+        self.start_year = self.start_year[2]
+        self.end_month = self.end_date[0]
+        self.end_day = self.end_date[1]
+        self.end_year = self.end_year[2]
+
+class Freebusy_Booking:
+    '''Where booking takes place'''
+    pass
+
+class Freebusy_App:
+    '''Combines display and booking'''
+    pass
+
+
 def get_creds():
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
@@ -187,7 +209,7 @@ def main():
     '''Input: start date, end date, robot'''
     args = get_args()
     robot_id = args['robot name']
-    assert valid_date.match(args['start date']), "Invalid date format"
+    assert valid_date.match(args['start date']), "Invalid date format" '''TODO: use strftime. This will only check the format'''
     assert valid_date.match(args['end date']), "Invalid date format"
     start_date = parse_date_from_args(args['start date'])
     end_date = parse_date_from_args(args['end date'])
