@@ -105,6 +105,76 @@ class World_Reporter(Reporter):
                 print("WARNING: robot is colliding with bin {}! Please jog the robot and change its handover pose!}".format(bin))
                 print()
 
+    def check_pose_position(self, pos, motion):
+        robot = self.world._env.GetKinBody(bin)
+        robot.SetDOFValues(np.deg2rad(pos))
+        tooltip_transform = robot.GetLink("frame_osaro_tooltip").GetTransform()[:3,3]
+        bins = self.readers["world"].bin_mesh_reader()
+        for bin in bins:
+            bin_transform = self.world._env.GetKinBody(bin).GetTransform()
+            origin = bin_transform[:3,3]
+            if tooltip_transform[2] < origin[2]:
+                print("WARNING: {} motion for bin {} is too low!".format(motion, bin))
+            else:
+                print("The tooltip distance from the bin is {}".format(tooltip_transform[2] - origin))
+            dimension = self.get_bin_size(bins[bin])
+            corner = np.dot(bin_transform, [dimension[:2], 0, 1])[:3]
+            if motion == 'pick':
+                if not self.pose_away_from_bin(tooltip_transform[:2], origin[:2], corner[:2]):
+                    print("WARNING: {} motion for bin {} is not away from the bin!".format(motion, bin))
+            elif motion == 'place':
+                if not self.pose_away_from_bin(tooltip_transform[:2], origin[:2], corner[:2]):
+                    print("WARNING: {} motion for bin {} is not within the x y range of bin!".format(motion, bin))
+
+    def pose_away_from_bin(self, tooltip_transform, origin, corner):
+        for a, b, c in zip(tooltip_transform, origin, corner):
+            if (a - b) * (a -c) <= 0:
+                return False
+
+        return True
+
+    def pose_within_bin(self, tooltip_transform, origin, corner):
+        for a, b, c in zip(tooltip_transform, origin, corner):
+            if (a -b) * (a- c) >= 0:
+                return False
+
+        return True
+
+
+
+
+
+
+
+    def get_bin_size(self, bin_path):
+        """
+
+        :param bin_path: The path of the bin mesh
+        :return: A 3D array of the dimension of bin in [x, y, z] in mm
+        """
+        path = os.path.dirname(bin_path)
+        dimension = []
+        size = 0
+        for c in path[::-1]:
+            if c == 'x':
+                dimension.append(size)
+                size = 0
+                continue
+            elif c == '_':
+                dimension.append(size)
+                break
+            elif c.isdigit():
+                size = size * 10 + (c - '0')
+            else:
+                print("WARNING: mesh naming is illegal!")
+
+            dimension = [dimension[1], dimension[2], dimension[0]]
+
+        return np.divide(dimension, 100)
+
+
+
+
     def show_bins(self):
         bins = self.readers["world"].bin_mesh_reader()
         for bin in bins:
