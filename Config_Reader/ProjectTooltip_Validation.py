@@ -1,5 +1,5 @@
 import argparse
-from projectTooltip_RR import ProjectTooltip_Reporter
+from Readers_Reporters.projectTooltip_RR import ProjectTooltip_Reporter
 def get_args():
     parser = argparse.ArgumentParser(description='Please specify config path'
                                                  'Must have project_to_tooltip.yaml config path')

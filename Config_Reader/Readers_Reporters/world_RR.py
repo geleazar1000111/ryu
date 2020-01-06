@@ -1,4 +1,4 @@
-from config_reader import Reader, Reporter
+from .config_reader import Reader, Reporter
 import os
 import numpy as np
 import odin

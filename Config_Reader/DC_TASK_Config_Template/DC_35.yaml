@@ -1,0 +1,5 @@
+Bin_Meshes: [saury_white_287x441x172, sanko_l4151b_yellow_388x530x334]
+End_Effectors: [single_piab_25mm_BGI25, single_piab_34mm_BGI34]
+Pick_Model: gqfcn-34mm-20191114-1985000
+Bin_Model: bin-detector-20191202-okura-1244000
+Cameras: [ovr, wrst]

@@ -1,0 +1,9 @@
+"""
+For each Data Collection Task, we should create a .yaml file with the name DC_?.yaml according to the Jira Ticket number.
+We need to manually input the information below according to what provided in the Jira Ticket
+"""
+Bin_Meshes:
+End_Effector_Meshes:
+Pick_Model:
+Bin_Model:
+Cameras:

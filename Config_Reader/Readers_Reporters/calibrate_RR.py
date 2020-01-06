@@ -1,7 +1,7 @@
-from config_reader import Reader, Reporter
-from hardware_RR import  Hardware_Reader
-from datacollection_RR import Datacollcetion_Reader
-from projectTooltip_RR import ProjectTooltip_Reader
+from .config_reader import Reader, Reporter
+from .hardware_RR import  Hardware_Reader
+from .datacollection_RR import Datacollcetion_Reader
+from .projectTooltip_RR import ProjectTooltip_Reader
 import os
 import numpy as np
 
