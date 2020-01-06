@@ -183,6 +183,10 @@ class Datacollection_Reporter(Reporter):
             for bin in dofs:
                 print("Checking dof for bin :", bin)
                 self.decorators["world"].check_collision(dofs[bin]["handover_start_dofs_deg"])
+                if bin.find("pick") != -1:
+                    self.decorators["world"].check_pose_position(dofs[bin]["handover_start_dofs_deg"], "pick")
+                elif bin.find("place") != -1:
+                    self.decorators["world"].check_pose_position(dofs[bin]["handover_start_dofs_deg"], "place")
 
 
 

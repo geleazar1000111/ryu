@@ -2,6 +2,11 @@ import argparse
 import os
 from Readers_Reporters.task_RR import Task_Reporter
 from Readers_Reporters.datacollection_RR import Datacollection_Reporter
+
+"""
+This script run a overall diagnosis on Data Collection config. It checks whether the required settings for a specific DC task 
+exist in the data collection config and then whether the parameters are legal or not.
+"""
 def get_args():
     parser = argparse.ArgumentParser(description='Please specify the task information yaml file and the root path of all config files')
     parser.add_argument("paths", nargs='+')
