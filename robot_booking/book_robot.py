@@ -29,56 +29,149 @@ robots = {
 }
 
 
-class Freebusy_Display:
+class FreebusyDisplay:
     '''Where displaying events takes place'''
+    def __init__(self, robot_id):
+        self.robot_id = robot_id
+
+    def display_freebusy(self, booked):
+        if booked:
+            for event in booked:
+                print("{} is booked {} until {}".format(self.robot_id, event['start'], event['end']))
+        else:
+            print("{} is free in this time range".format(self.robot_id))
+
+
+class FreebusyBooking:
+    '''Where booking takes place. Currently books the next available 1hr timeslot in given time range'''
+    def __init__(self, robot_id, booked, service):
+        self.robot_id = robot_id
+        self.service = service
+        self.booked = booked
+
+    def get_next_available(self):
+        '''This will get the next available 1 hr time slot'''
+        if len(self.booked) == 1:
+            event1_end = convert_google_datetime(self.booked[0]['end'])
+            if event1_end.time() <= WORK_END:
+                return event1_end
+        for i in range(len(self.booked) - 1):
+            event1_end = convert_google_datetime(self.booked[i]['end'])
+            event2_start = convert_google_datetime(self.booked[i + 1]['start'])
+            diff = event2_start - event1_end
+            print(event1_end)
+            diff_hours = diff.total_seconds() // 3600
+            print(diff_hours)
+            if diff_hours >= 1:
+                if event1_end.time() <= WORK_END:
+                    return event1_end
+
+    def construct_and_book_event(self):
+        start_event = self.get_next_available()
+        end_event = add_hour_to_datetime(start_event)
+        event = {
+            'summary': 'Data Collection',
+            'start': {
+                'dateTime': start_event.isoformat(),
+                'timeZone': 'US/Pacific',
+            },
+            'end': {
+                'dateTime': end_event.isoformat(),
+                'timeZone': 'US/Pacific',
+            },
+            'attendees': [{'email': robots[self.robot_id]}]
+        }
+        event = self.service.events().insert(calendarId='primary', body=event).execute()
+        print('{} now booked for data collection from {} to {}'.format(self.robot_id, start_event, end_event))
+        print('Link to event: {}'.format(event.get('htmlLink')))
+
+
+class FreebusyApp:
+    '''Combines display and booking'''
     def __init__(self, robot_id, start_date, end_date):
         self.robot_id = robot_id
-        self.start_date = self.parse_date_from_args(start_date)
-        self.end_date = self.parse_date_from_args(end_date)
-        self.start_month = self.start_date[0]
-        self.start_day = self.start_date[1]
-        self.start_year = self.start_year[2]
-        self.end_month = self.end_date[0]
-        self.end_day = self.end_date[1]
-        self.end_year = self.end_year[2]
+        self.start_month = start_date[0]
+        self.start_day = start_date[1]
+        self.start_year = start_date[2]
+        self.end_month = end_date[0]
+        self.end_day = end_date[1]
+        self.end_year = end_date[2]
+        self.creds = self.get_creds()
+        self.service = self.set_service()
+        self.booked = self.get_freebusy()
 
-class Freebusy_Booking:
-    '''Where booking takes place'''
-    pass
+    def run(self):
+        self.display_events()
+        if self.ask_to_book():
+            self.book_event()
 
-class Freebusy_App:
-    '''Combines display and booking'''
-    pass
+    def make_display(self):
+        return FreebusyDisplay(self.robot_id)
 
+    def make_booking(self):
+        return FreebusyBooking(self.robot_id, self.booked, self.service)
 
-def get_creds():
-    creds = None
-    # The file token.pickle stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'client_secrets.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
-    return creds
+    def book_event(self):
+        new_booking = self.make_booking()
+        new_booking.construct_and_book_event()
 
+    def display_events(self):
+        new_display = self.make_display()
+        new_display.display_freebusy(self.booked)
 
-def get_start(event):
-    return event['start'].get('dateTime', event['start'].get('date'))
+    def ask_to_book(self):
+        while True:
+            user_inp = input("Would you like to book the robot? (y/n) ")
+            if user_inp.lower() == 'y':
+                return True
+            elif user_inp.lower() == 'n':
+                return False
+            else:
+                print("Invalid option (please type y or n) ")
 
+    def get_creds(self):
+        creds = None
+        # The file token.pickle stores the user's access and refresh tokens, and is
+        # created automatically when the authorization flow completes for the first
+        # time.
+        if os.path.exists('token.pickle'):
+            with open('token.pickle', 'rb') as token:
+                creds = pickle.load(token)
+        # If there are no (valid) credentials available, let the user log in.
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    'client_secrets.json', SCOPES)
+                creds = flow.run_local_server(port=0)
+            # Save the credentials for the next run
+            with open('token.pickle', 'wb') as token:
+                pickle.dump(creds, token)
+        return creds
 
-def get_end(event):
-    return event['end'].get('dateTime', event['end'].get('date'))
+    def set_service(self):
+        return build('calendar', 'v3', credentials=self.creds)
+
+    def get_freebusy(self):
+        time_min = tz.localize(datetime(self.start_year, self.start_month, self.start_day))
+        '''include 2nd day in time_max hence adding 17 hours'''
+        time_max = tz.localize(datetime(self.end_year, self.end_month, self.end_day) + timedelta(hours=17))
+        body = {
+            "timeMin": time_min.isoformat(),
+            "timeMax": time_max.isoformat(),
+            "timeZone": 'US/Pacific',
+            "items": [
+                {
+                    "id": robots[self.robot_id]
+                }
+            ]
+        }
+
+        events_result = self.service.freebusy().query(body=body).execute()
+        calendar = events_result[u'calendars']
+        booked = calendar[robots[self.robot_id]]['busy']
+        return booked
 
 
 def is_single_day_event(datetime_str):
@@ -108,87 +201,12 @@ def get_day_of_week(event_date):
              + int(year / 400) + t[month - 1] + day) % 7)
 
 
-def ask_to_book():
-    while True:
-        user_inp = input("Would you like to book the robot? (y/n) ")
-        if user_inp.lower() == 'y':
-            return True
-        elif user_inp.lower() == 'n':
-            return False
-        else:
-            print("Invalid option (please type y or n) ")
-
-
-def get_freebusy(robot_id, start_month, start_day, start_year, end_month, end_day, end_year):
-    creds = get_creds()
-    service = build('calendar', 'v3', credentials=creds)
-    time_min = tz.localize(datetime(start_year, start_month, start_day))
-    time_max = tz.localize(datetime(end_year, end_month, end_day))
-    body = {
-        "timeMin": time_min.isoformat(),
-        "timeMax": time_max.isoformat(),
-        "timeZone": 'US/Pacific',
-        "items": [
-            {
-                "id": robots[robot_id]
-            }
-        ]
-    }
-
-    events_result = service.freebusy().query(body=body).execute()
-    calendar = events_result[u'calendars']
-    booked = calendar[robots[robot_id]]['busy']
-    if booked:
-        for event in booked:
-            print("{} is booked {} until {}".format(robot_id, event['start'], event['end']))
-        start_next_event = get_next_available(booked)
-    else:
-        print("{} is free in this time range".format(robot_id))
-        start_next_event = time_min + timedelta(hours=9)
-    if ask_to_book():
-        construct_and_book_event(service, robot_id, start_next_event, add_hour_to_datetime(start_next_event))
-
-
 def add_hour_to_datetime(curtime):
     return curtime + timedelta(hours=1)
 
 
 def add_day_to_datetime(curtime):
     return curtime + timedelta(days=1)
-
-
-def get_next_available(booked_events):
-    '''This will get the next available 1 hr time slot'''
-    if len(booked_events) == 1:
-        event1_end = convert_google_datetime(booked_events[0]['end'])
-        if event1_end.time() <= WORK_END:
-            return event1_end
-    for i in range(len(booked_events) - 1):
-        event1_end = convert_google_datetime(booked_events[i]['end'])
-        event2_start = convert_google_datetime(booked_events[i + 1]['start'])
-        diff = event2_start - event1_end
-        diff_hours = diff.total_seconds() // 3600
-        if diff_hours >= 1:
-            if event1_end.time() <= WORK_END:
-                return event1_end
-
-
-def construct_and_book_event(service, robot_id, start_event, end_event):
-    event = {
-        'summary': 'Data Collection',
-        'start': {
-            'dateTime': start_event.isoformat(),
-            'timeZone': 'US/Pacific',
-        },
-        'end': {
-            'dateTime': end_event.isoformat(),
-            'timeZone': 'US/Pacific',
-        },
-        'attendees': [{'email': robots[robot_id]}]
-    }
-    event = service.events().insert(calendarId='primary', body=event).execute()
-    print('{} now booked for data collection from {} to {}'.format(robot_id, start_event, end_event))
-    print('Link to event: {}'.format(event.get('htmlLink')))
 
 
 def get_args():
@@ -213,7 +231,8 @@ def main():
     assert valid_date.match(args['end date']), "Invalid date format"
     start_date = parse_date_from_args(args['start date'])
     end_date = parse_date_from_args(args['end date'])
-    get_freebusy(robot_id, start_date[0], start_date[1], start_date[2], end_date[0], end_date[1], end_date[2])
+    freebusy_app = FreebusyApp(robot_id, start_date, end_date)
+    freebusy_app.run()
 
 
 if __name__ == '__main__':
