@@ -105,46 +105,44 @@ class World_Reporter(Reporter):
                 print("WARNING: robot is colliding with bin {}! Please jog the robot and change its handover pose!}".format(bin))
                 print()
 
-    def check_pose_position(self, pos, motion):
-        robot = self.world._env.GetKinBody(bin)
+    def check_pose_position(self, pos, motion, bin):
+        robot = self.world._env.GetRobots()[0]
         robot.SetDOFValues(np.deg2rad(pos))
         tooltip_transform = robot.GetLink("frame_osaro_tooltip").GetTransform()[:3,3]
         bins = self.readers["world"].bin_mesh_reader()
-        for bin in bins:
-            bin_transform = self.world._env.GetKinBody(bin).GetTransform()
-            origin = bin_transform[:3,3]
-            if tooltip_transform[2] < origin[2]:
-                print("WARNING: {} motion for bin {} is too low!".format(motion, bin))
-            else:
-                print("The tooltip distance from the bin is {}".format(tooltip_transform[2] - origin))
-            dimension = self.get_bin_size(bins[bin])
-            corner = np.dot(bin_transform, [dimension[:2], 0, 1])[:3]
-            if motion == 'pick':
-                if not self.pose_away_from_bin(tooltip_transform[:2], origin[:2], corner[:2]):
-                    print("WARNING: {} motion for bin {} is not away from the bin!".format(motion, bin))
-            elif motion == 'place':
-                if not self.pose_away_from_bin(tooltip_transform[:2], origin[:2], corner[:2]):
-                    print("WARNING: {} motion for bin {} is not within the x y range of bin!".format(motion, bin))
 
-    def pose_away_from_bin(self, tooltip_transform, origin, corner):
-        for a, b, c in zip(tooltip_transform, origin, corner):
-            if (a - b) * (a -c) <= 0:
-                return False
+        bin_transform = self.world._env.GetKinBody(bin).GetTransform()
 
-        return True
+        origin = bin_transform[:3,3]
+        if tooltip_transform[2] < origin[2]:
+            print("WARNING: {} motion for bin {} is too low!".format(motion, bin))
+        else:
+            print("The tooltip distance from the bin {} is {} mm".format(bin, (tooltip_transform[2] - origin[2]) * 1000))
+
+        xyz_dimension = self.get_bin_size(bins[bin])
+        xy_dimension_extend = np.ones(4)
+        xy_dimension_extend[:3] = xyz_dimension
+        xy_dimension_extend[2] = 0
+        corner = np.dot(bin_transform, xy_dimension_extend)[:3]
+        print(tooltip_transform[:2], origin[:2], corner[:2])
+        if motion == 'pick':
+            if self.pose_within_bin(tooltip_transform[:2], origin[:2], corner[:2]):
+                print(tooltip_transform[:2], origin[:2], corner[:2])
+                print("WARNING: {} motion for bin {} is not away from the bin!".format(motion, bin))
+        elif motion == 'place':
+            if not self.pose_within_bin(tooltip_transform[:2], origin[:2], corner[:2]):
+                print(tooltip_transform[:2], origin[:2], corner[:2])
+                print("WARNING: {} motion for bin {} is not within the x y range of bin!".format(motion, bin))
+
+        print()
+
 
     def pose_within_bin(self, tooltip_transform, origin, corner):
         for a, b, c in zip(tooltip_transform, origin, corner):
-            if (a -b) * (a- c) >= 0:
+            if (a - b) * (a - c) >= 0:
                 return False
 
         return True
-
-
-
-
-
-
 
     def get_bin_size(self, bin_path):
         """
@@ -153,24 +151,27 @@ class World_Reporter(Reporter):
         :return: A 3D array of the dimension of bin in [x, y, z] in mm
         """
         path = os.path.dirname(bin_path)
+
         dimension = []
         size = 0
+        dim = ""
         for c in path[::-1]:
-            if c == 'x':
+            if c == "_":
+                break
+            dim += c
+        dim = dim[::-1]
+        for i in range(0, len(dim) + 1):
+            if i == len(dim):
+                dimension.append(size)
+
+            elif dim[i] == "x":
                 dimension.append(size)
                 size = 0
-                continue
-            elif c == '_':
-                dimension.append(size)
-                break
-            elif c.isdigit():
-                size = size * 10 + (c - '0')
             else:
-                print("WARNING: mesh naming is illegal!")
+                size = size * 10 + int(dim[i])
 
-            dimension = [dimension[1], dimension[2], dimension[0]]
-
-        return np.divide(dimension, 100)
+        dimension = [dimension[0], dimension[1], dimension[2]]
+        return np.divide(dimension, 1000)
 
 
 

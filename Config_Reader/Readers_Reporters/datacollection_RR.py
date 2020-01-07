@@ -39,10 +39,7 @@ class Datacollcetion_Reader(Reader):
     def dof_reader(self):
         dofs = {}
         for bin in self.config["bins"]:
-            dof = {}
-            dof["handover_start_dofs_deg"] = self.config["bins"][bin]["handover_start_dofs_deg"]
-            dof["handover_end_dofs_deg"] = self.config["bins"][bin]["handover_end_dofs_deg"]
-            dofs[bin] = dof
+            dofs[bin] = self.config["bins"][bin]
 
         return dofs
 
@@ -184,9 +181,9 @@ class Datacollection_Reporter(Reporter):
                 print("Checking dof for bin :", bin)
                 self.decorators["world"].check_collision(dofs[bin]["handover_start_dofs_deg"])
                 if bin.find("pick") != -1:
-                    self.decorators["world"].check_pose_position(dofs[bin]["handover_start_dofs_deg"], "pick")
+                    self.decorators["world"].check_pose_position(dofs[bin]["handover_start_dofs_deg"], "pick", dofs[bin]["bin_transform_name"])
                 elif bin.find("place") != -1:
-                    self.decorators["world"].check_pose_position(dofs[bin]["handover_start_dofs_deg"], "place")
+                    self.decorators["world"].check_pose_position(dofs[bin]["handover_start_dofs_deg"], "place", dofs[bin]["bin_transform_name"])
 
 
 
