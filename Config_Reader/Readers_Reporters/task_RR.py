@@ -77,14 +77,13 @@ class Task_Reporter(Reporter):
         config_ees = self.readers["datacollection"].end_effector_reader()
         for ee in self.readers["task"].end_effector_reader():
             if not any(ee == config_ee["name"] for config_ee in config_ees):
-                print(config_ee["name"] for config_ee in config_ees)
                 print("WARNING: End effector {} is not included in data collection config! Please add it in the config file!\n".format(ee))
 
     def show_pick_models(self):
         config_pick_models = self.readers["datacollection"].pick_model_reader()
         model = self.readers["task"].pick_model_reader()
         if model not in config_pick_models.keys():
-            print("WARNING: Specified bin model {} is not included in data collection config! Please install and include it in config file!\n".format(model))
+            print("WARNING: Specified pick model {} is not included in data collection config! Please install and include it in config file!\n".format(model))
 
     def show_bin_models(self):
         config_bin_models = self.readers["datacollection"].bin_model_reader()
