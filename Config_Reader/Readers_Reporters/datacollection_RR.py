@@ -56,6 +56,8 @@ class Datacollection_Reporter(Reporter):
         self.show_camera_setting()
         self.show_dof()
 
+        print("-------------------------------------------------------------------------------------------")
+
     def create_reader(self):
         for path in self.paths:
             if path.find("datacollection/config.yaml") != -1:
@@ -74,6 +76,7 @@ class Datacollection_Reporter(Reporter):
                 os.environ["ODIN_MESH_FOLDER"] = path
 
         print()
+        print("-------------------------------------------------------------------------------------------")
 
     def create_decorator(self):
         for path in self.paths:

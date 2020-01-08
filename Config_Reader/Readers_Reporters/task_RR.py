@@ -53,6 +53,7 @@ class Task_Reporter(Reporter):
                 self.readers["hardware"] = Hardware_Reader(path)
 
         print()
+        print("-------------------------------------------------------------------------------------------")
 
 
     def create_decorator(self):
@@ -71,6 +72,7 @@ class Task_Reporter(Reporter):
         self.show_camera_setting()
 
         print("IF YOU SEE NO WARNINGS ABOVE, YOU CAN START CHECKING OTHER CONFIGS\n")
+        print("-------------------------------------------------------------------------------------------")
 
 
     def show_end_effector(self):
