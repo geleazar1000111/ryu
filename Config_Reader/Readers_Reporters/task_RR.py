@@ -110,3 +110,4 @@ class Task_Reporter(Reporter):
             if not any([config_bin_meshes[bin_name].find(bin) != -1 for bin_name in config_bin_meshes]):
                 print("WARNING: bin mesh {} is not included in world config! Please create and add it!\n".format(bin))
 
+

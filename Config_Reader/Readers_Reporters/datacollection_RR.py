@@ -178,6 +178,7 @@ class Datacollection_Reporter(Reporter):
                     break_flag = True
 
         if self.decorators.get("world", None) and not break_flag:
+            self.decorators["world"].show_bins()
             self.decorators["world"].create_world(os.environ["ODIN_MESH_FOLDER"])
             for bin in dofs:
                 print("Checking dof for bin :", bin)
