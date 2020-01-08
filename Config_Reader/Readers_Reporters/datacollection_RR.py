@@ -141,11 +141,10 @@ class Datacollection_Reporter(Reporter):
         calibrations = self.readers["datacollection"].calibration_reader()
         camera_dict = self.readers["datacollection"].camera_setting_reader()
         print("Show cameras enbaled for each bin")
-        for bin in camera_dict.keys():
-            print("For motion ", bin, ", the cameras enabled are: ", camera_dict[bin])
         if self.readers.get("hardware", None):
             camera_hardware = self.readers["hardware"].camera_setting_reader()
             for bin in camera_dict.keys():
+                print("For motion ", bin, ", the cameras enabled are: ", camera_dict[bin])
                 for cam in camera_dict[bin]:
                     if cam not in camera_hardware:
                         print("FATAL ERROR: camera not enabled in hardware.yaml! Please delete {} in DC config or Hardware config!".format(cam))
