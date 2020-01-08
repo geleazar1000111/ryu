@@ -188,7 +188,7 @@ class World_Reporter(Reporter):
                 print("WARNING: {} does not exist, please create and move the models in mesh directory:{} !".format(bins[bin], os.environ["ODIN_MESH_FOLDER"]))
                 print()
                 continue
-            print("For bin {}, the x y z coordinate of its origin relative to the world is {}, and its rotation is {}.".format(bin, bin_locations[bin][0], bin_locations[bin][1]))
+            print("For bin: {}, location of its origin relative to the world is {}, and its rotation is {}.".format(bin, bin_locations[bin][0], bin_locations[bin][1]))
 
         print("The origin of bin is the top left corner if it is not rotated. The coordinate system of the bin is following right hand rule.")
         print("Please run bin bottom validation module to verify if the bin height setting is reasonable.")
