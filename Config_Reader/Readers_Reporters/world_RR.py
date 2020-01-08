@@ -190,7 +190,7 @@ class World_Reporter(Reporter):
                 continue
             print("For bin {}, the x y z coordinate of its origin relative to the world is {}, and its rotation is {}.".format(bin, bin_locations[bin][0], bin_locations[bin][1]))
 
-        print("The origin of bin is the top left corner if it is not rotated. ")
+        print("The origin of bin is the top left corner if it is not rotated. The coordinate system of the bin is following right hand rule.")
         print("Please run bin bottom validation module to verify if the bin height setting is reasonable.")
         print("The tooltip robot should just touch the bottom of bin if you run it.")
 

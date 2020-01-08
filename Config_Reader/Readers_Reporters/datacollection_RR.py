@@ -177,6 +177,7 @@ class Datacollection_Reporter(Reporter):
                     print("WARNING: Please modify the dof: {}, so it is above the lower limit: {}".format(dof, upper))
                     break_flag = True
 
+        print("___________________________")
         if self.decorators.get("world", None) and not break_flag:
             self.decorators["world"].show_bins()
             self.decorators["world"].create_world(os.environ["ODIN_MESH_FOLDER"])
