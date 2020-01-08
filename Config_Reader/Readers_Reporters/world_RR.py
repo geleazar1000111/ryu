@@ -124,7 +124,6 @@ class World_Reporter(Reporter):
         xy_dimension_extend[:3] = xyz_dimension
         xy_dimension_extend[2] = 0
         corner = np.dot(bin_transform, xy_dimension_extend)[:3]
-        print(tooltip_transform[:2], origin[:2], corner[:2])
         if motion == 'pick':
             if self.pose_within_bin(tooltip_transform[:2], origin[:2], corner[:2]):
                 print(tooltip_transform[:2], origin[:2], corner[:2])
