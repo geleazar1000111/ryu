@@ -147,9 +147,9 @@ class Datacollection_Reporter(Reporter):
                 print("For motion ", bin, ", the cameras enabled are: ", camera_dict[bin])
                 for cam in camera_dict[bin]:
                     if cam not in camera_hardware:
-                        print("FATAL ERROR: camera not enabled in hardware.yaml! Please delete {} in DC config or Hardware config!".format(cam))
+                        print("FATAL ERROR: camera not enabled in hardware.yaml! Please delete {} in DC config or Hardware config!\n".format(cam))
                     if cam not in calibrations:
-                        print("WARNING: Camera transform {} is not listed in the cached calibration list!".format(cam))
+                        print("WARNING: Camera transform {} is not listed in the cached calibration list!\n".format(cam))
 
         print()
 
