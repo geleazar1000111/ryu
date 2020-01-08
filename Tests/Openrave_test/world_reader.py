@@ -61,17 +61,16 @@ def cli(world_file, odin_mesh_folder):
         robot = world._env.GetRobots()[0]
         robot.SetDOFValues(np.deg2rad(dofs_deg))
 
-    def get_distance_query():
-        # NOT WORKING!
-        report = openravepy.CollisionReport()
-        env = world._env
-        if not env.GetCollisionChecker().SetCollisionOptions(openravepy.CollisionOptions.Distance | openravepy.CollisionOptions.Contacts):
-            print('current checker does not support distance, switching to pqp...')
-            collisionChecker = openravepy.RaveCreateCollisionChecker(env, 'pqp')
-            collisionChecker.SetCollisionOptions(openravepy.CollisionOptions.Distance | openravepy.CollisionOptions.Contacts)
-            env.SetCollisionChecker(collisionChecker)
-        env.CheckCollision(body1 = world._env.GetRobots()[0].GetLink('base_link_gripper'), body2 = world._env.GetKinBody("a_bin"), report = report)
-        print('mindist: ',report.minDistance * 1000, "mm")
+    def get_bin_height(dofs_deg: np.ndarray):
+        """
+
+        :return:
+        """
+        set_robot_dofs(np.ndarray)
+        robot = world._env.GetRobots()[0]
+        tooltip_transform = robot.GetLink("frame_osaro_tooltip").GetTransform()[:3,3]
+
+        print("The height of bin according to the tooltip position is {}".format(tooltip_transform[2] * 1000))
 
 
 
