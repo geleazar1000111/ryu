@@ -46,7 +46,7 @@ class World_Reporter(Reporter):
     def create_reader(self):
         for path in self.paths:
             if path.find("world.yaml") != -1:
-                print("Creating world reader from", path)
+                #print("Creating world reader from", path)
                 self.readers["world"] = World_Reader(path)
             elif path.find("mesh") != -1:
                 os.environ["ODIN_MESH_FOLDER"] = path

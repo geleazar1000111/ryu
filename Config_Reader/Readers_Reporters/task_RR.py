@@ -38,18 +38,18 @@ class Task_Reporter(Reporter):
     def create_reader(self):
         for path in self.paths:
             if path.find("DC") != -1:
-                print ("Creating data collection task reader from: ", path)
+                #print ("Creating data collection task reader from: ", path)
                 self.readers["task"] = Task_Reader(path)
             elif path.find("datacollection/config.yaml") != -1:
-                print ("Creating datacollection reader from: ", path)
+                #print ("Creating datacollection reader from: ", path)
                 self.readers["datacollection"] = Datacollcetion_Reader(path)
             elif path.find("world.yaml") != -1:
-                print("Creating world reader from", path)
+                #print("Creating world reader from", path)
                 self.readers["world"] = World_Reader(path)
             elif path.find("mesh") != -1:
                 os.environ["ODIN_MESH_FOLDER"] = path
             elif path.find("hardware.yaml") != -1:
-                print("Creating hardware reader from", path)
+                #print("Creating hardware reader from", path)
                 self.readers["hardware"] = Hardware_Reader(path)
 
         print()

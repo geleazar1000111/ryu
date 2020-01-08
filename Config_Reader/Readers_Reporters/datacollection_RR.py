@@ -61,16 +61,16 @@ class Datacollection_Reporter(Reporter):
     def create_reader(self):
         for path in self.paths:
             if path.find("datacollection/config.yaml") != -1:
-                print ("Creating datacollection reader from: ", path)
+                #print ("Creating datacollection reader from: ", path)
                 self.readers["datacollection"] = Datacollcetion_Reader(path)
             elif path.find("world.yaml") != -1:
-                print("Creating world reader from", path)
+                #print("Creating world reader from", path)
                 self.readers["world"] = World_Reader(path)
             elif path.find("hardware.yaml") != -1:
-                print("Creating hardware reader from", path)
+                #print("Creating hardware reader from", path)
                 self.readers["hardware"] = Hardware_Reader(path)
             elif path.find("armcontrol.yaml") != -1:
-                print("Creating armcontrol reader from", path)
+                #print("Creating armcontrol reader from", path)
                 self.readers["armcontrol"] = Armcontrol_Reader(path)
             elif path.find("mesh") != -1:
                 os.environ["ODIN_MESH_FOLDER"] = path
@@ -81,7 +81,7 @@ class Datacollection_Reporter(Reporter):
     def create_decorator(self):
         for path in self.paths:
             if path.find("world.yaml") != -1:
-                print("Creating affiliated world config reporter from ", path)
+                #print("Creating affiliated world config reporter from ", path)
                 self.decorators["world"] = World_Reporter(self.paths)
 
     def show_end_effector(self):
