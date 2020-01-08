@@ -42,7 +42,7 @@ class World_Reader(Reader):
         bins = {}
         for key in self.config.keys():
             if key == "a_bin" or key == "b_bin":
-                bins[key] = [self.config[key]["local_position"], self.config[key]["local_local_euler"]]
+                bins[key] = [self.config[key]["local_position"], self.config[key]["local_euler"]]
 
         return bins
 
