@@ -192,6 +192,6 @@ class World_Reporter(Reporter):
 
         print("The origin of bin is the top left corner if it is not rotated. The coordinate system of the bin is following right hand rule.")
         print("Please run bin bottom validation module to verify if the bin height setting is reasonable.")
-        print("The tooltip robot should just touch the bottom of bin if you run it.")
+        print("The tooltip should just touch the bottom of bin if you run it.")
 
         print()
