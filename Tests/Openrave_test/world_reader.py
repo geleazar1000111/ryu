@@ -66,7 +66,7 @@ def cli(world_file, odin_mesh_folder):
 
         :return:
         """
-        set_robot_dofs(np.ndarray)
+        set_robot_dofs(dofs_deg)
         robot = world._env.GetRobots()[0]
         tooltip_transform = robot.GetLink("frame_osaro_tooltip").GetTransform()[:3,3]
 
