@@ -189,6 +189,8 @@ class Datacollection_Reporter(Reporter):
                 elif bin.find("place") != -1:
                     self.decorators["world"].check_pose_position(dofs[bin]["handover_start_dofs_deg"], "place", dofs[bin]["bin_transform_name"])
 
+            print("Please verify whether the distance is longer than the longest item in the item set.")
+
 
 
 
