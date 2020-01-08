@@ -133,7 +133,7 @@ class Datacollection_Reporter(Reporter):
             camera_hardware = self.readers["hardware"].camera_setting_reader()
             for cali in calibrations:
                 if cali not in camera_hardware:
-                    print("FATAL ERROR: camera not enabled in hardware.yaml! Please delete {} in DC config or Hardware config!".format(cali))
+                    print("FATAL ERROR: camera not enabled in hardware.yaml! Please delete {} in DC config or add it in Hardware config!".format(cali))
 
         print()
 
