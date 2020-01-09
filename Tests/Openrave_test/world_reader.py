@@ -69,8 +69,11 @@ def cli(world_file, odin_mesh_folder):
         set_robot_dofs(dofs_deg)
         robot = world._env.GetRobots()[0]
         tooltip_transform = robot.GetLink("frame_osaro_tooltip").GetTransform()[:3,3]
-
+        config = yaml.load(world_file)
+        print("Please ensure your pose is touching the top of the bin you are measuring!")
         print("The height of bin according to the tooltip position is {}".format(tooltip_transform[2] * 1000))
+        print("The height in world.yaml is {} for {}".format(config["a_bin"]["local_position"], "a_bin"))
+        print("The height in world.yaml is {} for {}".format(config["b_bin"]["local_position"], "b_bin"))
 
 
 
