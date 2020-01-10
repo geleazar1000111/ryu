@@ -11,6 +11,6 @@ Current tools:
     - The .xml files are created by copying from the tip template and then modifying them. I think it would be more efficient to create the .xml files without copying them, but since these aren't very large files I don't think it's that big of a deal (for now).
     
 
-  - Robot booking script: ```python book_robot.py [robot key] [start date] [end date]```
+  - Robot booking: ```python book_robot.py [robot key] [start date] [end date]```
     
-    This checks for the availability of a specified robot within a time range. The user must specify the positional arguments robot key (listed with the ```--help``` option), the start date, and the end date (both in the format ```MM/DD/YYYY```) in that order. The script will list when the robot is booked within that time range and will offer to book the next available 1 hr time slot per the user's request.
+    This checks for the availability of a specified robot within a time range. The user must specify the positional arguments robot key (listed with the ```--help``` option), the start date, and the end date (both in the format ```MM/DD/YYYY```) in that order. The script will list when the robot is free within that time range and will allow the user to book a free time slot per their request.
