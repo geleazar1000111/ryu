@@ -1,9 +1,13 @@
+"""This class builds free time slots based on the specified time range and events that are booked in that time range.
+First, days are generated as nested dictionaries that are stored in the days in range attribute. The workday is
+defined as the value for the 'range' key. 'booked' is another key that gets filled in later, if there are any booked
+events in that specified time range. Once any booked events are appended to the 'booked' list, free time slots are
+then created. If there are no booked events, then the whole day is created as a free event."""
 from datetime import datetime, timedelta
 import re
 
 
 class FreeBusyEventBuilder:
-    '''Where creating free event time slots takes place.'''
 
     def __init__(self, robot_id):
         self.robot_id = robot_id

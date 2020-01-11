@@ -1,5 +1,8 @@
+"""This purpose of this class is to book a given free timeslot. It takes in the robot id, robots dict, and the
+Google Service. An object of this class needs to connect to the user's Google calendar to book an event."""
+
+
 class FreebusyBooking:
-    '''Where booking takes place. Currently books the next available timeslot in given time range'''
     def __init__(self, robot_id, robots, service):
         self.robot_id = robot_id
         self.robots = robots

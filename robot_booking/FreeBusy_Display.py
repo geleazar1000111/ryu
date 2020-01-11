@@ -1,5 +1,7 @@
+"""A simple class that displays free time slots organized in a list. It takes in the robot id."""
+
+
 class FreebusyDisplay:
-    '''Where displaying free events takes place.'''
     def __init__(self, robot_id):
         self.robot_id = robot_id
 
