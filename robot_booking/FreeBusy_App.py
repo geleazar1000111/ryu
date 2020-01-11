@@ -1,3 +1,4 @@
+"""This class connects to the Google calendar API service. It combines creation, display, and booking."""
 #from __future__ import print_function
 from __future__ import print_function
 import re
