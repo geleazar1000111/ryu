@@ -26,9 +26,9 @@ class FreebusyBooking:
                 'dateTime': end_event.isoformat(),
                 'timeZone': 'US/Pacific',
             },
-            'attendees': [{'email': robots[self.robot_id]}]
+            'attendees': [{'email': self.robots[self.robot_id]}]
         }
-        event = self.construct_event(choice)
+        #event = self.construct_event(choice)
         event = self.service.events().insert(calendarId='primary', body=event).execute()
         print('{} now booked for data collection from {} to {}'.format(self.robot_id, start_event, end_event))
         print('Link to event: {}'.format(event.get('htmlLink')))
