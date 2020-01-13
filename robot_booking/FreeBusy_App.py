@@ -96,7 +96,7 @@ class FreebusyApp:
         return booked
 
     def book_event(self):
-        self.booking.construct_events_dict(self.display.free_events)
+        self.booking.construct_events_dict(self.free_event_builder.free_events)
         choice = self.ask_for_choice()
         self.booking.book_event(choice)
 
@@ -111,7 +111,7 @@ class FreebusyApp:
             user_inp = input("Please input a number between 1 and the number of free events: ")
             if user_inp:
                 assert isinstance(int(user_inp), int), "Invalid option"
-                assert 1 <= int(user_inp) <= len(self.display.free_events), "Index out of range"
+                assert 1 <= int(user_inp) <= len(self.booking.free_events), "Index out of range"
                 return int(user_inp)
             else:
                 return 1
