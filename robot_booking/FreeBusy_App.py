@@ -38,11 +38,15 @@ class FreebusyApp:
         self.free_event_builder = None
 
     def run(self):
-        self.initialize()
-        self.make_free_events()
-        self.display_events()
-        if self.ask_to_book():
-            self.book_event()
+        try:
+            self.initialize()
+            self.make_free_events()
+            self.display_events()
+            if self.ask_to_book():
+                self.book_event()
+            print("Script ran successfully")
+        except:
+            print("Script failed!")
 
     def initialize(self):
         self.creds = self.get_creds()
