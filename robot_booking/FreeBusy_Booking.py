@@ -3,9 +3,9 @@ Google Service. An object of this class needs to connect to the user's Google ca
 
 
 class FreebusyBooking:
-    def __init__(self, robot_id, robots, service):
-        self.robot_id = robot_id
-        self.robots = robots
+    def __init__(self, robots, service):
+        #self.robot_id = robot_id
+        #self.robots = robots
         self.service = service
         self.free_events = {}
 
@@ -13,7 +13,7 @@ class FreebusyBooking:
         for num, event in enumerate(free, 1):
             self.free_events[num] = event
 
-    def book_event(self, choice):
+    def book_event(self, robot_id, choice, robot_resource_name):
         start_event = self.free_events[choice]['start']
         end_event = self.free_events[choice]['end']
         event = {
@@ -26,9 +26,9 @@ class FreebusyBooking:
                 'dateTime': end_event.isoformat(),
                 'timeZone': 'US/Pacific',
             },
-            'attendees': [{'email': self.robots[self.robot_id]}]
+            'attendees': [{'email': robot_resource_name}]
         }
         #event = self.construct_event(choice)
         event = self.service.events().insert(calendarId='primary', body=event).execute()
-        print('{} now booked for data collection from {} to {}'.format(self.robot_id, start_event, end_event))
+        print('{} now booked for data collection from {} to {}'.format(robot_id, start_event, end_event))
         print('Link to event: {}'.format(event.get('htmlLink')))
