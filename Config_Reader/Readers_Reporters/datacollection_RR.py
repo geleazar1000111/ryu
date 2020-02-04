@@ -61,16 +61,16 @@ class Datacollection_Reporter(Reporter):
     def create_reader(self):
         for path in self.paths:
             if path.find("datacollection/config.yaml") != -1:
-                print ("Creating datacollection reader from: ", path)
+                #print ("Creating datacollection reader from: ", path)
                 self.readers["datacollection"] = Datacollcetion_Reader(path)
             elif path.find("world.yaml") != -1:
-                print("Creating world reader from", path)
+                #print("Creating world reader from", path)
                 self.readers["world"] = World_Reader(path)
             elif path.find("hardware.yaml") != -1:
-                print("Creating hardware reader from", path)
+                #print("Creating hardware reader from", path)
                 self.readers["hardware"] = Hardware_Reader(path)
             elif path.find("armcontrol.yaml") != -1:
-                print("Creating armcontrol reader from", path)
+                #print("Creating armcontrol reader from", path)
                 self.readers["armcontrol"] = Armcontrol_Reader(path)
             elif path.find("mesh") != -1:
                 os.environ["ODIN_MESH_FOLDER"] = path
@@ -81,7 +81,7 @@ class Datacollection_Reporter(Reporter):
     def create_decorator(self):
         for path in self.paths:
             if path.find("world.yaml") != -1:
-                print("Creating affiliated world config reporter from ", path)
+                #print("Creating affiliated world config reporter from ", path)
                 self.decorators["world"] = World_Reporter(self.paths)
 
     def show_end_effector(self):
@@ -177,7 +177,9 @@ class Datacollection_Reporter(Reporter):
                     print("WARNING: Please modify the dof: {}, so it is above the lower limit: {}".format(dof, upper))
                     break_flag = True
 
+        print("___________________________")
         if self.decorators.get("world", None) and not break_flag:
+            self.decorators["world"].show_bins()
             self.decorators["world"].create_world(os.environ["ODIN_MESH_FOLDER"])
             for bin in dofs:
                 print("Checking dof for bin :", bin)
@@ -186,6 +188,8 @@ class Datacollection_Reporter(Reporter):
                     self.decorators["world"].check_pose_position(dofs[bin]["handover_start_dofs_deg"], "pick", dofs[bin]["bin_transform_name"])
                 elif bin.find("place") != -1:
                     self.decorators["world"].check_pose_position(dofs[bin]["handover_start_dofs_deg"], "place", dofs[bin]["bin_transform_name"])
+
+            print("Please verify whether the distance is longer than the longest item in the item set.")
 
 
 

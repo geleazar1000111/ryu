@@ -61,17 +61,22 @@ def cli(world_file, odin_mesh_folder):
         robot = world._env.GetRobots()[0]
         robot.SetDOFValues(np.deg2rad(dofs_deg))
 
-    def get_distance_query():
-        # NOT WORKING!
-        report = openravepy.CollisionReport()
-        env = world._env
-        if not env.GetCollisionChecker().SetCollisionOptions(openravepy.CollisionOptions.Distance | openravepy.CollisionOptions.Contacts):
-            print('current checker does not support distance, switching to pqp...')
-            collisionChecker = openravepy.RaveCreateCollisionChecker(env, 'pqp')
-            collisionChecker.SetCollisionOptions(openravepy.CollisionOptions.Distance | openravepy.CollisionOptions.Contacts)
-            env.SetCollisionChecker(collisionChecker)
-        env.CheckCollision(body1 = world._env.GetRobots()[0].GetLink('base_link_gripper'), body2 = world._env.GetKinBody("a_bin"), report = report)
-        print('mindist: ',report.minDistance * 1000, "mm")
+    def get_bin_height(dofs_deg: np.ndarray):
+        """
+
+        :return:
+        """
+        set_robot_dofs(dofs_deg)
+        robot = world._env.GetRobots()[0]
+        tooltip_transform = robot.GetLink("frame_osaro_tooltip").GetTransform()[:3,3]
+        config = None
+        with open(world_file) as f:
+            contents = f.read()
+            config = yaml.load(contents)
+        print("Please ensure your pose is touching the top of the bin you are measuring!")
+        print("The height of bin according to the tooltip position is {}".format(tooltip_transform[2] * 1000))
+        print("The height in world.yaml is {} for {}".format(config["a_bin"]["local_position"][2], "a_bin"))
+        print("The height in world.yaml is {} for {}".format(config["b_bin"]["local_position"][2], "b_bin"))
 
 
 

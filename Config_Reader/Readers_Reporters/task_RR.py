@@ -38,18 +38,18 @@ class Task_Reporter(Reporter):
     def create_reader(self):
         for path in self.paths:
             if path.find("DC") != -1:
-                print ("Creating data collection task reader from: ", path)
+                #print ("Creating data collection task reader from: ", path)
                 self.readers["task"] = Task_Reader(path)
             elif path.find("datacollection/config.yaml") != -1:
-                print ("Creating datacollection reader from: ", path)
+                #print ("Creating datacollection reader from: ", path)
                 self.readers["datacollection"] = Datacollcetion_Reader(path)
             elif path.find("world.yaml") != -1:
-                print("Creating world reader from", path)
+                #print("Creating world reader from", path)
                 self.readers["world"] = World_Reader(path)
             elif path.find("mesh") != -1:
                 os.environ["ODIN_MESH_FOLDER"] = path
             elif path.find("hardware.yaml") != -1:
-                print("Creating hardware reader from", path)
+                #print("Creating hardware reader from", path)
                 self.readers["hardware"] = Hardware_Reader(path)
 
         print()
@@ -109,4 +109,5 @@ class Task_Reporter(Reporter):
         for bin in self.readers["task"].bin_mesh_reader():
             if not any([config_bin_meshes[bin_name].find(bin) != -1 for bin_name in config_bin_meshes]):
                 print("WARNING: bin mesh {} is not included in world config! Please create and add it!\n".format(bin))
+
 

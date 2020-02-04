@@ -24,9 +24,6 @@ class World_Reader(Reader):
     def bin_model_reader(self):
         pass
 
-    def bin_mesh_reader(self):
-        return [self.config["a_bin"], self.config["b_bin"]]
-
     def camera_setting_reader(self):
         pass
 
@@ -41,12 +38,20 @@ class World_Reader(Reader):
 
         return bins
 
+    def bin_position_reader(self):
+        bins = {}
+        for key in self.config.keys():
+            if key == "a_bin" or key == "b_bin":
+                bins[key] = [self.config[key]["local_position"], self.config[key]["local_euler"]]
+
+        return bins
+
 class World_Reporter(Reporter):
 
     def create_reader(self):
         for path in self.paths:
             if path.find("world.yaml") != -1:
-                print("Creating world reader from", path)
+                #print("Creating world reader from", path)
                 self.readers["world"] = World_Reader(path)
             elif path.find("mesh") != -1:
                 os.environ["ODIN_MESH_FOLDER"] = path
@@ -177,12 +182,16 @@ class World_Reporter(Reporter):
 
     def show_bins(self):
         bins = self.readers["world"].bin_mesh_reader()
+        bin_locations = self.readers["world"].bin_position_reader()
         for bin in bins:
-            print("For bin : {}, the bin path is: {}".format(bin, bins[bin]))
             if not os.path.exists(os.path.join(os.environ["ODIN_MESH_FOLDER"], bins[bin])):
                 print("WARNING: {} does not exist, please create and move the models in mesh directory:{} !".format(bins[bin], os.environ["ODIN_MESH_FOLDER"]))
                 print()
+                continue
+            print("For bin: {}, location of its origin relative to the world is {}, and its rotation is {}.".format(bin, bin_locations[bin][0], bin_locations[bin][1]))
 
-        print("Please check whether the bins are right ones in robot cell")
+        print("The origin of bin is the top left corner if it is not rotated. The coordinate system of the bin is following right hand rule.")
+        print("Please run bin bottom validation module to verify if the bin height setting is reasonable.")
+        print("The tooltip should just touch the bottom of bin if you run it.")
 
         print()
