@@ -1,4 +1,4 @@
-"""This class connects to the Google calendar API service. It combines creation, display, and booking."""
+"""This class connects to the Google calendar API service and handles user interface commands"""
 #from __future__ import print_function
 from __future__ import print_function
 import re
@@ -10,9 +10,9 @@ import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
-import FreeBusy_Booking as fb_booking
-import FreeBusy_Display as fb_display
-import FreeBusyEvent_Builder as fb_builder
+import robot_booking.FreeBusy_Booking as fb_booking
+import robot_booking.FreeBusy_Display as fb_display
+import robot_booking.FreeBusyEvent_Builder as fb_builder
 
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
@@ -21,8 +21,8 @@ tz = pytz.timezone('US/Pacific')
 
 class FreebusyApp:
     '''Combines display and booking'''
-    def __init__(self, robot_id, robots, start_date, end_date):
-        self.robot_id = robot_id
+    def __init__(self, robot_ids, robots, start_date, end_date):
+        self.robot_ids = robot_ids
         self.robots = robots
         self.start_month = start_date[0]
         self.start_day = start_date[1]
@@ -32,10 +32,10 @@ class FreebusyApp:
         self.end_year = end_date[2]
         self.creds = None
         self.service = None
-        self.booked = None
+        """self.booked = None
         self.display = None
         self.booking = None
-        self.free_event_builder = None
+        self.free_event_builder = None"""
 
     def run(self):
         try:
@@ -51,10 +51,18 @@ class FreebusyApp:
     def initialize(self):
         self.creds = self.get_creds()
         self.set_service()
-        self.booked = self.get_freebusy()
+        for id in self.robot_ids:
+            booked = self.get_freebusy(id)
+            free_event_builder = fb_builder.FreeBusyEventBuilder(id)
+            free_event_builder.initialize_free_events(booked, self.start_year, self.start_month, self.start_day, self.end_year, self.end_month, self.end_day)
+            display = fb_display.FreebusyDisplay(id)
+            display.display_free_events(free_event_builder.free_events)
+            #booking = fb_booking.FreebusyBooking(id, self.robots, self.service)
+            #free_event_builder = fb_builder.FreeBusyEventBuilder(id)
+        """self.booked = self.get_freebusy()
         self.display = fb_display.FreebusyDisplay(self.robot_id)
         self.booking = fb_booking.FreebusyBooking(self.robot_id, self.robots, self.service)
-        self.free_event_builder = fb_builder.FreeBusyEventBuilder(self.robot_id)
+        self.free_event_builder = fb_builder.FreeBusyEventBuilder(self.robot_id)"""
 
     def set_service(self):
         self.service = build('calendar', 'v3', credentials=self.creds)
@@ -80,7 +88,7 @@ class FreebusyApp:
                 pickle.dump(creds, token)
         return creds
 
-    def get_freebusy(self):
+    def get_freebusy(self, robot_id):
         time_min = tz.localize(datetime(self.start_year, self.start_month, self.start_day, hour=9))
         time_max = tz.localize(datetime(self.end_year, self.end_month, self.end_day, hour=17))
         body = {
@@ -89,14 +97,14 @@ class FreebusyApp:
             "timeZone": 'US/Pacific',
             "items": [
                 {
-                    "id": self.robots[self.robot_id]
+                    "id": self.robots[robot_id]
                 }
             ]
         }
 
         events_result = self.service.freebusy().query(body=body).execute()
         calendar = events_result[u'calendars']
-        booked = calendar[self.robots[self.robot_id]]['busy']
+        booked = calendar[self.robots[robot_id]]['busy']
         return booked
 
     def book_event(self):
@@ -104,8 +112,8 @@ class FreebusyApp:
         choice = self.ask_for_choice()
         self.booking.book_event(choice)
 
-    def make_free_events(self):
-        self.free_event_builder.initialize_free_events(self.booked, self.start_year, self.start_month, self.start_day, self.end_year, self.end_month, self.end_day)
+    def make_free_events(self, booked):
+        self.free_event_builder.initialize_free_events(booked, self.start_year, self.start_month, self.start_day, self.end_year, self.end_month, self.end_day)
 
     def display_events(self):
         self.display.display_free_events(self.free_event_builder.free_events)
